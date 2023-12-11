@@ -6,8 +6,7 @@ Module: 1-concurrent_coroutines.py
 
 
 import asyncio
-bs = __import__('0-basic_async_syntax')
-wait_random = bs.wait_random
+wait_random = __import__('0-basic_async_syntax').wait_random
 
 
 async def wait_n(n: int, max_delay: int) -> list:
