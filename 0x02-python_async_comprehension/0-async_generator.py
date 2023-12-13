@@ -11,7 +11,7 @@ import random
 
 async def async_generator():
     """
-    coroutine that loops 10X, 
+    coroutine that loops 10X,
     each time asynchronously wait 1 second,
     then yield a random number between 0 and 10
     """
