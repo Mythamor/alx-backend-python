@@ -53,7 +53,6 @@ class TestGetJson(unittest.TestCase):
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False}),
     ])
-
     def test_get_json(self, url, expected_output):
         """
         Tests for utils get json method
@@ -62,7 +61,7 @@ class TestGetJson(unittest.TestCase):
         mock_json = Mock()
         mock_json.json.return_value = expected_output
 
-        with patch('requests.get', return_value = mock_json):
+        with patch('requests.get', return_value=mock_json):
             # Call get_json with the url
             result = get_json("url")
 
@@ -95,13 +94,13 @@ class TestMemoize(unittest.TestCase):
                 a_property returns a_method
                 """
                 return self.a_method()
-        
+
         test_instance = TestClass()
-        
+
         # Use patch.object to mock a_method
-        with patch.object(test_instance, 'a_method', 
-                return_value=42) as mock_a_method:
-            
+        with patch.object(test_instance, 'a_method',
+                          return_value=42) as mock_a_method:
+
             # Call a_property twice
             result1 = test_instance.a_property
             result2 = test_instance.a_property
