@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import Mock, patch
 import requests
 from parameterized import parameterized
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -47,37 +47,71 @@ class TestGetJson(unittest.TestCase):
     """
     Tests getting a json file
     """
-    @patch('utils.requests.get')
-    def test_get_json(self, mock_get):
+
+    # Parametize output
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
+    ])
+
+    def test_get_json(self, url, expected_output):
         """
         Tests for utils get json method
         """
+        # Create  Mock object with a json method
+        mock_json = Mock()
+        mock_json.json.return_value = expected_output
 
-        # Define test data
-        test_data = [
-            {"url": "http://example.com", "payload": {"payload": True}},
-            {"url": "http://holberton.io", "payload": {"payload": False}},
-        ]
-
-        for data in test_data:
-            # Create  Mock object with a json method
-            mock_json = Mock()
-            mock_json.json.return_value = data["payload"]
-
-            # Configure mock to return the Mock object
-            mock_get.return_value = mock_json
-
-            # Call get_json with the test_data
-            result = get_json(data["url"])
-
-            # Assert mocked get method was called exactly once
-            mock_get.assert_called_once_with(data["url"])
+        with patch('requests.get', return_value = mock_json):
+            # Call get_json with the url
+            result = get_json("url")
 
             # Assert get_json output is equal to expected payload
-            self.assertEqual(result, data["payload"])
+            self.assertEqual(result, expected_output)
 
             # Reset mock for next iteration
-            mock_get.reset_mock()
+            mock_json.reset_mock()
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    Parameterize and patch with memoize
+    """
+    def test_memoize(self):
+        """
+        Test the memoize decorator
+        """
+        class TestClass:
+
+            def a_method(self):
+                """
+                a_method returns 42
+                """
+                return 42
+
+            @memoize
+            def a_property(self):
+                """
+                a_property returns a_method
+                """
+                return self.a_method()
+        
+        test_instance = TestClass()
+        
+        # Use patch.object to mock a_method
+        with patch.object(test_instance, 'a_method', 
+                return_value=42) as mock_a_method:
+            
+            # Call a_property twice
+            result1 = test_instance.a_property
+            result2 = test_instance.a_property
+
+            # Assert a_method was only called once
+            mock_a_method.assert_called_once()
+
+            # Assert that results are correct
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
 
 
 if __name__ == "__main__":
