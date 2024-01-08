@@ -60,10 +60,12 @@ class TestGetJson(unittest.TestCase):
         ]
 
         for data in test_data:
-            # Configure mock to return a Mock object with a json mehod
-            mock_json = Mock(return_value=data["payload"])
-            mock_response = Mock(json=mock_json)
-            mock_get.return_value = mock_response
+            # Create  Mock object with a json method
+            mock_json = Mock()
+            mock_json.json.return_value = data["payload"]
+
+            # Configure mock to return the Mock object
+            mock_get.return_value = mock_json
 
             # Call get_json with the test_data
             result = get_json(data["url"])
